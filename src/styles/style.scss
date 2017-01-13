@@ -1,0 +1,9 @@
+html,body{background: #2a2b52; color:#fff;}
+*{box-sizing: border-box;}
+a{text-decoration:none;}
+
+.alert__link{
+	cursor: pointer;
+	font-weight: bold;
+	&:hover{text-decoration: underline;}
+}
