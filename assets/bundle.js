@@ -22052,17 +22052,19 @@
 	
 	__webpack_require__(/*! whatwg-fetch */ 182);
 	
-	var _UrlConst = __webpack_require__(/*! ../const/UrlConst */ 183);
+	var _ProductReviews = __webpack_require__(/*! ./ProductReviews */ 183);
 	
-	var _Alerts = __webpack_require__(/*! ../const/Alerts */ 184);
+	var _ProductReviews2 = _interopRequireDefault(_ProductReviews);
 	
-	var _ProductList = __webpack_require__(/*! ../components/ProductList */ 185);
+	var _UrlConst = __webpack_require__(/*! ../const/UrlConst */ 184);
 	
-	var _ProductPage = __webpack_require__(/*! ../components/ProductPage */ 186);
+	var _Alerts = __webpack_require__(/*! ../const/Alerts */ 185);
 	
-	var _RegLogForm = __webpack_require__(/*! ../components/RegLogForm */ 187);
+	var _ProductList = __webpack_require__(/*! ../components/ProductList */ 186);
 	
-	var _ProductReviews = __webpack_require__(/*! ../components/ProductReviews */ 188);
+	var _ProductPage = __webpack_require__(/*! ../components/ProductPage */ 187);
+	
+	var _RegLogForm = __webpack_require__(/*! ../components/RegLogForm */ 188);
 	
 	var _AuthControl = __webpack_require__(/*! ../components/AuthControl */ 189);
 	
@@ -22090,11 +22092,9 @@
 				products: [],
 				reviews: [],
 	
-				reviewRate: 1,
-				reviewText: '',
+				token: '',
 	
 				product: null,
-				productID: null,
 	
 				hideForm: true,
 				hideProductList: false,
@@ -22127,8 +22127,8 @@
 				this.setState({ pass: e.target.value });
 			}
 		}, {
-			key: 'validateForm',
-			value: function validateForm(login, pass) {
+			key: 'validateAuthForm',
+			value: function validateAuthForm(login, pass) {
 				if (!(login && pass)) {
 					this.setState({ authAlert: _Alerts.AuthAlerts.empty });
 					return true;
@@ -22168,64 +22168,17 @@
 			}
 		}, {
 			key: 'requestLogReg',
-			value: function requestLogReg(url, login, pass) {
+			value: function requestLogReg(url, username, password) {
 				return fetch(url, {
 					method: 'POST',
 					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify({
-						username: login,
-						password: pass
-					})
+					body: JSON.stringify({ username: username, password: password })
 				}).then(function (response) {
 					return response.json();
 				}).then(function (json) {
 					return json;
 				}).catch(function (ex) {
-					return console.log('parsing failed', ex);
-				});
-			}
-		}, {
-			key: 'setRate',
-			value: function setRate(reviewRate) {
-				this.setState({ reviewRate: reviewRate });
-			}
-		}, {
-			key: 'setText',
-			value: function setText(reviewText) {
-				this.setState({ reviewText: reviewText });
-			}
-		}, {
-			key: 'addReview',
-			value: function addReview(id) {
-				var _this3 = this;
-	
-				if (this.state.reviewText == '') {
-					this.setState({ reviewAlert: _Alerts.ReviewAlerts.empty });
-					return;
-				}
-	
-				return fetch(_UrlConst.UrlConst.reviews + id, {
-					method: 'POST',
-					headers: {
-						'Content-Type': 'application/json',
-						'Authorization': 'Token ' + this.state.token
-					},
-					body: JSON.stringify({
-						rate: this.state.reviewRate,
-						text: this.state.reviewText
-					})
-				}).then(function (response) {
-					return response.json();
-				}).then(function (json) {
-					_this3.setState({
-						reviewRate: 1,
-						reviewText: '',
-						reviewAlert: _Alerts.ReviewAlerts.success
-					});
-					return json;
-				}).catch(function (ex) {
-					_this3.setState({ reviewAlert: _Alerts.ReviewAlerts.serverError });
-					console.log('parsing failed', ex);
+					return console.log(ex);
 				});
 			}
 		}, {
@@ -22243,13 +22196,13 @@
 		}, {
 			key: 'authorize',
 			value: function authorize(url) {
-				var _this4 = this;
+				var _this3 = this;
 	
-				if (this.validateForm(this.state.login, this.state.pass)) return null;
+				if (this.validateAuthForm(this.state.login, this.state.pass)) return null;
 	
 				this.requestLogReg(url, this.state.login, this.state.pass).then(function (data) {
 					if (!data.success) {
-						_this4.setState({ authAlert: _react2.default.createElement(
+						_this3.setState({ authAlert: _react2.default.createElement(
 								'div',
 								{ className: 'alert alert-danger' },
 								_react2.default.createElement(
@@ -22263,8 +22216,8 @@
 						return null;
 					}
 	
-					_this4.setState({
-						logName: _this4.state.login,
+					_this3.setState({
+						logName: _this3.state.login,
 						token: data.token,
 						isLogged: true
 					});
@@ -22273,7 +22226,7 @@
 		}, {
 			key: 'showProduct',
 			value: function showProduct(id, product) {
-				var _this5 = this;
+				var _this4 = this;
 	
 				this.setState({
 					hideProductList: true,
@@ -22283,7 +22236,7 @@
 				});
 	
 				this.getReviewsByID(_UrlConst.UrlConst.reviews, id).then(function (data) {
-					_this5.setState({ reviews: data });
+					_this4.setState({ reviews: data });
 				});
 			}
 		}, {
@@ -22326,19 +22279,13 @@
 							products: this.state.products,
 							product: this.state.product
 						},
-						_react2.default.createElement(_ProductReviews.ProductReviews, {
-							setRate: this.setRate.bind(this),
-							setText: this.setText.bind(this),
-							addReview: this.addReview.bind(this),
+						_react2.default.createElement(_ProductReviews2.default, {
 							showAuthForm: this.showAuthForm.bind(this),
 							hide: this.state.hideProductReviews,
 							reviews: this.state.reviews,
 							logged: this.state.isLogged,
 							product: this.state.product,
-							reviewAlert: this.state.reviewAlert,
-	
-							reviewRate: this.state.reviewRate,
-							reviewText: this.state.reviewText
+							token: this.state.token
 						})
 					)
 				);
@@ -23327,6 +23274,199 @@
 
 /***/ },
 /* 183 */
+/*!******************************************!*\
+  !*** ./src/containers/ProductReviews.js ***!
+  \******************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _react = __webpack_require__(/*! react */ 1);
+	
+	var _react2 = _interopRequireDefault(_react);
+	
+	var _promisePolyfill = __webpack_require__(/*! promise-polyfill */ 179);
+	
+	var _promisePolyfill2 = _interopRequireDefault(_promisePolyfill);
+	
+	__webpack_require__(/*! whatwg-fetch */ 182);
+	
+	var _UrlConst = __webpack_require__(/*! ../const/UrlConst */ 184);
+	
+	var _Alerts = __webpack_require__(/*! ../const/Alerts */ 185);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	if (!window.Promise) {
+		window.Promise = _promisePolyfill2.default;
+	}
+	
+	var ProductReviews = function (_React$Component) {
+		_inherits(ProductReviews, _React$Component);
+	
+		function ProductReviews() {
+			_classCallCheck(this, ProductReviews);
+	
+			var _this = _possibleConstructorReturn(this, (ProductReviews.__proto__ || Object.getPrototypeOf(ProductReviews)).call(this));
+	
+			_this.state = { reviewAlert: null };
+			return _this;
+		}
+	
+		_createClass(ProductReviews, [{
+			key: 'addReview',
+			value: function addReview(id, rate, text) {
+				var _this2 = this;
+	
+				if (text == '') {
+					this.setState({ reviewAlert: _Alerts.ReviewAlerts.empty });
+					return null;
+				}
+	
+				return fetch(_UrlConst.UrlConst.reviews + id, {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json',
+						'Authorization': 'Token ' + this.props.token
+					},
+					body: JSON.stringify({ rate: rate, text: text })
+				}).then(function (response) {
+					return response.json();
+				}).then(function (json) {
+					_this2.setState({ reviewAlert: _Alerts.ReviewAlerts.success });
+					_this2.reviewText.value = '';
+					_this2.reviewRate.value = 1;
+					return json;
+				}).catch(function (ex) {
+					_this2.setState({ reviewAlert: _Alerts.ReviewAlerts.serverError });
+					console.log(ex);
+				});
+			}
+		}, {
+			key: 'render',
+			value: function render() {
+				var _this3 = this;
+	
+				// console.log('ProductReview this ', this);
+	
+				var review = this.props.reviews.map(function (item) {
+					return _react2.default.createElement(
+						'li',
+						{ className: 'list-group-item justify-content-between', key: item.id },
+						_react2.default.createElement(
+							'div',
+							{ className: 'd-flex w-100 justify-content-between' },
+							_react2.default.createElement(
+								'h5',
+								{ className: 'mb-1' },
+								item.created_by.username
+							),
+							_react2.default.createElement(
+								'small',
+								{ className: 'text-muted' },
+								item.created_at
+							)
+						),
+						item.text,
+						_react2.default.createElement(
+							'span',
+							{ className: 'badge badge-success badge-pill' },
+							item.rate
+						)
+					);
+				});
+	
+				var reviewForm = _react2.default.createElement(
+					'div',
+					{ className: 'mb-4' },
+					_react2.default.createElement('textarea', { className: 'form-control', rows: '3',
+						ref: function ref(input) {
+							return _this3.reviewText = input;
+						}
+					}),
+					_react2.default.createElement(
+						'select',
+						{ className: 'form-control col-sm-6',
+							ref: function ref(input) {
+								return _this3.reviewRate = input;
+							}
+						},
+						[1, 2, 3, 4, 5].map(function (item, i) {
+							return _react2.default.createElement(
+								'option',
+								{ key: i },
+								item
+							);
+						})
+					),
+					_react2.default.createElement(
+						'button',
+						{ className: 'btn btn-info',
+							onClick: function onClick() {
+								return _this3.addReview(_this3.props.product.id, _this3.reviewRate.value, _this3.reviewText.value);
+							}
+						},
+						'Send review'
+					)
+				);
+	
+				var pleaseLogin = _react2.default.createElement(
+					'div',
+					{ className: 'alert alert-info' },
+					'Please\xA0',
+					_react2.default.createElement(
+						'span',
+						{ className: 'alert__link',
+							onClick: this.props.showAuthForm
+						},
+						'login'
+					),
+					'\xA0to add a review.'
+				);
+	
+				var setReview = this.props.logged ? reviewForm : pleaseLogin;
+	
+				var pattern = _react2.default.createElement(
+					'div',
+					{ className: 'col' },
+					this.state.reviewAlert ? this.state.reviewAlert : null,
+					setReview,
+					_react2.default.createElement(
+						'h3',
+						{ className: 'my-3' },
+						'Reviews'
+					),
+					_react2.default.createElement(
+						'ul',
+						{ className: 'list-group', style: { color: '#2a2b32' } },
+						review
+					)
+				);
+	
+				return this.props.hide ? null : pattern;
+			}
+		}]);
+	
+		return ProductReviews;
+	}(_react2.default.Component);
+	
+	exports.default = ProductReviews;
+	;
+
+/***/ },
+/* 184 */
 /*!*******************************!*\
   !*** ./src/const/UrlConst.js ***!
   \*******************************/
@@ -23348,7 +23488,7 @@
 	// helloworld
 
 /***/ },
-/* 184 */
+/* 185 */
 /*!*****************************!*\
   !*** ./src/const/Alerts.js ***!
   \*****************************/
@@ -23423,7 +23563,7 @@
 	};
 
 /***/ },
-/* 185 */
+/* 186 */
 /*!***************************************!*\
   !*** ./src/components/ProductList.js ***!
   \***************************************/
@@ -23485,7 +23625,7 @@
 	};
 
 /***/ },
-/* 186 */
+/* 187 */
 /*!***************************************!*\
   !*** ./src/components/ProductPage.js ***!
   \***************************************/
@@ -23539,7 +23679,7 @@
 	};
 
 /***/ },
-/* 187 */
+/* 188 */
 /*!**************************************!*\
   !*** ./src/components/RegLogForm.js ***!
   \**************************************/
@@ -23605,137 +23745,6 @@
 			"div",
 			{ className: "my-4" },
 			props.logged ? logged : authform
-		);
-	
-		return props.hide ? null : pattern;
-	};
-
-/***/ },
-/* 188 */
-/*!******************************************!*\
-  !*** ./src/components/ProductReviews.js ***!
-  \******************************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	
-	Object.defineProperty(exports, "__esModule", {
-		value: true
-	});
-	exports.ProductReviews = undefined;
-	
-	var _react = __webpack_require__(/*! react */ 1);
-	
-	var _react2 = _interopRequireDefault(_react);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	var ProductReviews = exports.ProductReviews = function ProductReviews(props) {
-		// console.log(props.product.id);
-		var review = props.reviews.map(function (item) {
-			return _react2.default.createElement(
-				"li",
-				{ className: "list-group-item justify-content-between", key: item.id },
-				_react2.default.createElement(
-					"div",
-					{ className: "d-flex w-100 justify-content-between" },
-					_react2.default.createElement(
-						"h5",
-						{ className: "mb-1" },
-						item.created_by.username
-					),
-					_react2.default.createElement(
-						"small",
-						{ className: "text-muted" },
-						item.created_at
-					)
-				),
-				item.text,
-				_react2.default.createElement(
-					"span",
-					{ className: "badge badge-success badge-pill" },
-					item.rate
-				)
-			);
-		});
-	
-		var addReview = props.logged ? _react2.default.createElement(
-			"div",
-			{ className: "mb-4" },
-			_react2.default.createElement("textarea", {
-				value: props.reviewText,
-				onChange: function onChange(e) {
-					return props.setText(e.target.value);
-				}, className: "form-control", rows: "3" }),
-			_react2.default.createElement(
-				"select",
-				{
-					value: props.reviewRate,
-					onChange: function onChange(e) {
-						return props.setRate(e.target.value);
-					}, className: "form-control col-sm-6" },
-				_react2.default.createElement(
-					"option",
-					null,
-					"1"
-				),
-				_react2.default.createElement(
-					"option",
-					null,
-					"2"
-				),
-				_react2.default.createElement(
-					"option",
-					null,
-					"3"
-				),
-				_react2.default.createElement(
-					"option",
-					null,
-					"4"
-				),
-				_react2.default.createElement(
-					"option",
-					null,
-					"5"
-				)
-			),
-			_react2.default.createElement(
-				"button",
-				{ onClick: function onClick() {
-						return props.addReview(props.product.id);
-					}, className: "btn btn-info" },
-				"Send review"
-			)
-		) : _react2.default.createElement(
-			"div",
-			{ className: "alert alert-info" },
-			"Please\xA0",
-			_react2.default.createElement(
-				"span",
-				{ onClick: function onClick() {
-						return props.showAuthForm();
-					}, className: "alert__link" },
-				"login"
-			),
-			"\xA0to add a review."
-		);
-	
-		var pattern = _react2.default.createElement(
-			"div",
-			{ className: "col" },
-			props.reviewAlert ? props.reviewAlert : null,
-			addReview,
-			_react2.default.createElement(
-				"h3",
-				{ className: "my-3" },
-				"Reviews"
-			),
-			_react2.default.createElement(
-				"ul",
-				{ className: "list-group", style: { color: '#2a2b32' } },
-				review
-			)
 		);
 	
 		return props.hide ? null : pattern;
