@@ -3,13 +3,14 @@ import Promise from 'promise-polyfill';
 if (!window.Promise) {window.Promise = Promise;}
 import 'whatwg-fetch';
 
+import ProductReviews 					from './ProductReviews';
+
 import { UrlConst } 					from '../const/UrlConst';
 import { AuthAlerts, ReviewAlerts } 	from '../const/Alerts';
 
 import { ProductList } 					from '../components/ProductList';
 import { ProductPage } 					from '../components/ProductPage';
 import { RegLogForm } 					from '../components/RegLogForm';
-import { ProductReviews } 				from '../components/ProductReviews';
 import { AuthControl } 					from '../components/AuthControl';
 
 
@@ -19,11 +20,9 @@ export default class App extends React.Component{
 			products: [],
 			reviews: [],
 
-			reviewRate: 1,
-			reviewText: '',
+			token: '',
 
 			product: null,
-			productID: null,
 
 			hideForm: true,
 			hideProductList: false,
@@ -43,7 +42,7 @@ export default class App extends React.Component{
 	setLogin(e){this.setState({ login: e.target.value });}
 	setPass(e){this.setState({ pass: e.target.value });}
 
-	validateForm(login, pass){
+	validateAuthForm(login, pass){
 		if( !(login && pass) ) {
 			this.setState({authAlert: AuthAlerts.empty});
 			return true;
@@ -73,64 +72,16 @@ export default class App extends React.Component{
 			.catch(ex => console.log('parsing failed', ex));
 	}
 
-	requestLogReg(url, login, pass){
+	requestLogReg(url, username, password){
 		return fetch(url, {
 			method: 'POST',
 			headers: {'Content-Type': 'application/json'},
-			body: JSON.stringify({
-				username: login,
-				password: pass
-			})
-		}).then(response => response.json())
+			body: JSON.stringify({ username, password })
+		})
+		.then(response => response.json())
 		.then(json => json)
-		.catch(ex => console.log('parsing failed', ex));
+		.catch(ex => console.log(ex));
 	}
-
-
-
-	setRate(reviewRate){this.setState({ reviewRate });}
-	setText(reviewText){this.setState({ reviewText });}
-	
-
-
-
-
-
-
-	addReview(id){
-		if(this.state.reviewText == '') {
-			this.setState({reviewAlert: ReviewAlerts.empty});
-			return;
-		}
-
-		return fetch( UrlConst.reviews + id, {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-					'Authorization': 'Token ' + this.state.token
-				},
-				body: JSON.stringify({
-					rate: this.state.reviewRate,
-					text: this.state.reviewText
-				})
-			})
-			.then(response => response.json())
-			.then(json => {
-				this.setState({
-					reviewRate: 1,
-					reviewText: '',
-					reviewAlert: ReviewAlerts.success
-				});
-				return json;
-			})
-			.catch(ex => {
-				this.setState({reviewAlert: ReviewAlerts.serverError});
-				console.log('parsing failed', ex)
-			});
-	}
-
-
-
 
 
 	submitLogin(e){
@@ -143,7 +94,7 @@ export default class App extends React.Component{
 	}
 
 	authorize(url){
-		if( this.validateForm(this.state.login, this.state.pass) ) return null;
+		if( this.validateAuthForm(this.state.login, this.state.pass) ) return null;
 
 		this.requestLogReg(url, this.state.login, this.state.pass)
 			.then(data => {
@@ -167,18 +118,16 @@ export default class App extends React.Component{
 	}
 	
 
-	showProduct(id, item){
+	showProduct(id, product){
 		this.setState({
 			hideProductList: true,
 			hideProductPage: false,
 			hideProductReviews: false,
-			product: item
+			product: product
 		});
 
 		this.getReviewsByID(UrlConst.reviews, id)
-			.then(data => {
-				this.setState({reviews: data});
-			});
+			.then( data => { this.setState({reviews: data}); });
 	}
 
 	showAuthForm(){
@@ -217,19 +166,13 @@ export default class App extends React.Component{
 					products={this.state.products}
 					product={this.state.product}
 				>
-					<ProductReviews 
-						setRate={this.setRate.bind(this)} 
-						setText={this.setText.bind(this)} 
-						addReview={this.addReview.bind(this)} 
+					<ProductReviews  
 						showAuthForm={this.showAuthForm.bind(this)} 
 						hide={this.state.hideProductReviews} 
 						reviews={this.state.reviews} 
 						logged={this.state.isLogged}
 						product={this.state.product}
-						reviewAlert={this.state.reviewAlert}
-
-						reviewRate={this.state.reviewRate}
-						reviewText={this.state.reviewText}
+						token={this.state.token}
 					/>
 				</ProductPage>
 			</div>

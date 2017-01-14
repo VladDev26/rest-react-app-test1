@@ -22112,8 +22112,8 @@
 			value: function componentDidMount() {
 				var _this2 = this;
 	
-				this.getAllProducts(_UrlConst.UrlConst.products).then(function (response) {
-					return _this2.setState({ products: response });
+				this.getAllProducts(_UrlConst.UrlConst.products).then(function (arr) {
+					return _this2.setState({ products: arr });
 				});
 			}
 		}, {
@@ -22129,12 +22129,18 @@
 		}, {
 			key: 'validateForm',
 			value: function validateForm(login, pass) {
-				var whitespaces = /\s/;
-	
-				if (!(login && pass)) return true;
-				// if( whitespaces.test(login) || whitespaces.test(pass) ) return true;
-				if (/\s/.test(login || pass)) return true;
-				if (login.length < 3 || pass.length < 3) return true;
+				if (!(login && pass)) {
+					this.setState({ authAlert: _Alerts.AuthAlerts.empty });
+					return true;
+				}
+				if (/\s/.test(login) || /\s/.test(pass)) {
+					this.setState({ authAlert: _Alerts.AuthAlerts.whitespace });
+					return true;
+				}
+				if (login.length < 3 || pass.length < 3) {
+					this.setState({ authAlert: _Alerts.AuthAlerts.lengthError });
+					return true;
+				}
 	
 				return false;
 			}
@@ -22243,7 +22249,18 @@
 	
 				this.requestLogReg(url, this.state.login, this.state.pass).then(function (data) {
 					if (!data.success) {
-						console.log(data.message);return null;
+						_this4.setState({ authAlert: _react2.default.createElement(
+								'div',
+								{ className: 'alert alert-danger' },
+								_react2.default.createElement(
+									'strong',
+									null,
+									'Error! '
+								),
+								data.message
+							) });
+						console.log(data.message);
+						return null;
 					}
 	
 					_this4.setState({
@@ -22255,14 +22272,14 @@
 			}
 		}, {
 			key: 'showProduct',
-			value: function showProduct(id, item) {
+			value: function showProduct(id, product) {
 				var _this5 = this;
 	
 				this.setState({
 					hideProductList: true,
 					hideProductPage: false,
 					hideProductReviews: false,
-					product: item
+					product: product
 				});
 	
 				this.getReviewsByID(_UrlConst.UrlConst.reviews, id).then(function (data) {
@@ -22294,7 +22311,8 @@
 						submitReg: this.submitReg.bind(this),
 						hide: this.state.hideForm,
 						logged: this.state.isLogged,
-						logName: this.state.logName
+						logName: this.state.logName,
+						authAlert: this.state.authAlert
 					}),
 					_react2.default.createElement(_ProductList.ProductList, {
 						showProduct: this.showProduct.bind(this),
@@ -23341,7 +23359,7 @@
 	Object.defineProperty(exports, "__esModule", {
 		value: true
 	});
-	exports.ReviewAlerts = undefined;
+	exports.AuthAlerts = exports.ReviewAlerts = undefined;
 	
 	var _react = __webpack_require__(/*! react */ 1);
 	
@@ -23368,6 +23386,39 @@
 				null,
 				"Something went wrong :("
 			)
+		)
+	};
+	
+	var AuthAlerts = exports.AuthAlerts = {
+		whitespace: _react2.default.createElement(
+			"div",
+			{ className: "alert alert-danger" },
+			_react2.default.createElement(
+				"strong",
+				null,
+				"Error! "
+			),
+			"Please remove whitespaces."
+		),
+		empty: _react2.default.createElement(
+			"div",
+			{ className: "alert alert-danger" },
+			_react2.default.createElement(
+				"strong",
+				null,
+				"Error! "
+			),
+			"Please fill all fields."
+		),
+		lengthError: _react2.default.createElement(
+			"div",
+			{ className: "alert alert-danger" },
+			_react2.default.createElement(
+				"strong",
+				null,
+				"Error! "
+			),
+			"Length must be at least 3 characters."
 		)
 	};
 
@@ -23511,6 +23562,7 @@
 		var authform = _react2.default.createElement(
 			"form",
 			{ className: "col-md-4 mx-auto" },
+			props.authAlert && !props.logged ? props.authAlert : null,
 			_react2.default.createElement(
 				"div",
 				{ className: "form-group" },
