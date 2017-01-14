@@ -6,7 +6,7 @@ export const ProductList = props => {
 			<div className="col-xs-12 col-sm-6 col-md-4 col-lg-3" key={item.id}>
 				<div className="card text-center my-2" style={{background: '#2a2b32'}}>
 					<div style={{cursor: 'pointer'}} onClick={() => props.showProduct(item.id, item)}>
-						<img className="card-img-top" 
+						<img className="card-img-top img-fluid" 
 							src={'http://smktesting.herokuapp.com/static/' + item.img} alt=""/>
 						<div className="card-block">
 							<h4 className="card-title">{item.title}</h4>
