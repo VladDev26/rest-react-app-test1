@@ -22056,15 +22056,17 @@
 	
 	var _ProductReviews2 = _interopRequireDefault(_ProductReviews);
 	
+	var _AuthForm = __webpack_require__(/*! ./AuthForm */ 186);
+	
+	var _AuthForm2 = _interopRequireDefault(_AuthForm);
+	
 	var _UrlConst = __webpack_require__(/*! ../const/UrlConst */ 184);
 	
 	var _Alerts = __webpack_require__(/*! ../const/Alerts */ 185);
 	
-	var _ProductList = __webpack_require__(/*! ../components/ProductList */ 186);
+	var _ProductList = __webpack_require__(/*! ../components/ProductList */ 187);
 	
-	var _ProductPage = __webpack_require__(/*! ../components/ProductPage */ 187);
-	
-	var _RegLogForm = __webpack_require__(/*! ../components/RegLogForm */ 188);
+	var _ProductPage = __webpack_require__(/*! ../components/ProductPage */ 188);
 	
 	var _AuthControl = __webpack_require__(/*! ../components/AuthControl */ 189);
 	
@@ -22092,8 +22094,6 @@
 				products: [],
 				reviews: [],
 	
-				token: '',
-	
 				product: null,
 	
 				hideForm: true,
@@ -22102,6 +22102,7 @@
 				hideProductReviews: true,
 				hideAuthControl: false,
 	
+				token: null,
 				isLogged: false
 			};
 			return _this;
@@ -22112,37 +22113,9 @@
 			value: function componentDidMount() {
 				var _this2 = this;
 	
-				this.getAllProducts(_UrlConst.UrlConst.products).then(function (arr) {
-					return _this2.setState({ products: arr });
+				this.getAllProducts(_UrlConst.UrlConst.products).then(function (products) {
+					return _this2.setState({ products: products });
 				});
-			}
-		}, {
-			key: 'setLogin',
-			value: function setLogin(e) {
-				this.setState({ login: e.target.value });
-			}
-		}, {
-			key: 'setPass',
-			value: function setPass(e) {
-				this.setState({ pass: e.target.value });
-			}
-		}, {
-			key: 'validateAuthForm',
-			value: function validateAuthForm(login, pass) {
-				if (!(login && pass)) {
-					this.setState({ authAlert: _Alerts.AuthAlerts.empty });
-					return true;
-				}
-				if (/\s/.test(login) || /\s/.test(pass)) {
-					this.setState({ authAlert: _Alerts.AuthAlerts.whitespace });
-					return true;
-				}
-				if (login.length < 3 || pass.length < 3) {
-					this.setState({ authAlert: _Alerts.AuthAlerts.lengthError });
-					return true;
-				}
-	
-				return false;
 			}
 		}, {
 			key: 'getAllProducts',
@@ -22167,66 +22140,9 @@
 				});
 			}
 		}, {
-			key: 'requestLogReg',
-			value: function requestLogReg(url, username, password) {
-				return fetch(url, {
-					method: 'POST',
-					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify({ username: username, password: password })
-				}).then(function (response) {
-					return response.json();
-				}).then(function (json) {
-					return json;
-				}).catch(function (ex) {
-					return console.log(ex);
-				});
-			}
-		}, {
-			key: 'submitLogin',
-			value: function submitLogin(e) {
-				e.preventDefault();
-				this.authorize(_UrlConst.UrlConst.log);
-			}
-		}, {
-			key: 'submitReg',
-			value: function submitReg(e) {
-				e.preventDefault();
-				this.authorize(_UrlConst.UrlConst.reg);
-			}
-		}, {
-			key: 'authorize',
-			value: function authorize(url) {
-				var _this3 = this;
-	
-				if (this.validateAuthForm(this.state.login, this.state.pass)) return null;
-	
-				this.requestLogReg(url, this.state.login, this.state.pass).then(function (data) {
-					if (!data.success) {
-						_this3.setState({ authAlert: _react2.default.createElement(
-								'div',
-								{ className: 'alert alert-danger' },
-								_react2.default.createElement(
-									'strong',
-									null,
-									'Error! '
-								),
-								data.message
-							) });
-						console.log(data.message);
-						return null;
-					}
-	
-					_this3.setState({
-						logName: _this3.state.login,
-						token: data.token,
-						isLogged: true
-					});
-				});
-			}
-		}, {
 			key: 'showProduct',
 			value: function showProduct(id, product) {
-				var _this4 = this;
+				var _this3 = this;
 	
 				this.setState({
 					hideProductList: true,
@@ -22235,8 +22151,8 @@
 					product: product
 				});
 	
-				this.getReviewsByID(_UrlConst.UrlConst.reviews, id).then(function (data) {
-					_this4.setState({ reviews: data });
+				this.getReviewsByID(_UrlConst.UrlConst.reviews, id).then(function (reviews) {
+					_this3.setState({ reviews: reviews });
 				});
 			}
 		}, {
@@ -22248,6 +22164,16 @@
 				});
 			}
 		}, {
+			key: 'setLogged',
+			value: function setLogged(flag) {
+				flag ? this.setState({ isLogged: true }) : this.setState({ isLogged: false });
+			}
+		}, {
+			key: 'setToken',
+			value: function setToken(token) {
+				this.setState({ token: token });
+			}
+		}, {
 			key: 'render',
 			value: function render() {
 				return _react2.default.createElement(
@@ -22257,15 +22183,11 @@
 						hide: this.state.hideAuthControl,
 						showAuthForm: this.showAuthForm.bind(this)
 					}),
-					_react2.default.createElement(_RegLogForm.RegLogForm, {
-						setLogin: this.setLogin.bind(this),
-						setPass: this.setPass.bind(this),
-						submitLogin: this.submitLogin.bind(this),
-						submitReg: this.submitReg.bind(this),
+					_react2.default.createElement(_AuthForm2.default, {
+						setLogged: this.setLogged.bind(this),
+						setToken: this.setToken.bind(this),
 						hide: this.state.hideForm,
-						logged: this.state.isLogged,
-						logName: this.state.logName,
-						authAlert: this.state.authAlert
+						logged: this.state.isLogged
 					}),
 					_react2.default.createElement(_ProductList.ProductList, {
 						showProduct: this.showProduct.bind(this),
@@ -22294,13 +22216,6 @@
 	
 		return App;
 	}(_react2.default.Component);
-	
-	// headers: {
-	// 'Accept': 'application/json',
-	// 'Content-Type': 'application/json'
-	// 'Authorization': 'Token ' + AAAtoken
-	// },
-	
 	
 	exports.default = App;
 
@@ -23564,6 +23479,193 @@
 
 /***/ },
 /* 186 */
+/*!************************************!*\
+  !*** ./src/containers/AuthForm.js ***!
+  \************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _react = __webpack_require__(/*! react */ 1);
+	
+	var _react2 = _interopRequireDefault(_react);
+	
+	var _promisePolyfill = __webpack_require__(/*! promise-polyfill */ 179);
+	
+	var _promisePolyfill2 = _interopRequireDefault(_promisePolyfill);
+	
+	__webpack_require__(/*! whatwg-fetch */ 182);
+	
+	var _UrlConst = __webpack_require__(/*! ../const/UrlConst */ 184);
+	
+	var _Alerts = __webpack_require__(/*! ../const/Alerts */ 185);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	if (!window.Promise) {
+		window.Promise = _promisePolyfill2.default;
+	}
+	
+	var AuthForm = function (_React$Component) {
+		_inherits(AuthForm, _React$Component);
+	
+		function AuthForm() {
+			_classCallCheck(this, AuthForm);
+	
+			var _this = _possibleConstructorReturn(this, (AuthForm.__proto__ || Object.getPrototypeOf(AuthForm)).call(this));
+	
+			_this.state = {
+				authAlert: null
+			};
+			return _this;
+		}
+	
+		_createClass(AuthForm, [{
+			key: 'validateAuthForm',
+			value: function validateAuthForm(login, pass) {
+				if (!(login && pass)) {
+					this.setState({ authAlert: _Alerts.AuthAlerts.empty });
+					return true;
+				}
+				if (/\s/.test(login) || /\s/.test(pass)) {
+					this.setState({ authAlert: _Alerts.AuthAlerts.whitespace });
+					return true;
+				}
+				if (login.length < 3 || pass.length < 3) {
+					this.setState({ authAlert: _Alerts.AuthAlerts.lengthError });
+					return true;
+				}
+	
+				return false;
+			}
+		}, {
+			key: 'requestLogReg',
+			value: function requestLogReg(url, username, password) {
+				return fetch(url, {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({ username: username, password: password })
+				}).then(function (response) {
+					return response.json();
+				}).then(function (json) {
+					return json;
+				}).catch(function (ex) {
+					return console.log(ex);
+				});
+			}
+		}, {
+			key: 'authorize',
+			value: function authorize(event, url, username, password) {
+				var _this2 = this;
+	
+				event.preventDefault();
+				if (this.validateAuthForm(username, password)) return null;
+	
+				this.requestLogReg(url, username, password).then(function (data) {
+					if (!data.success) {
+						_this2.setState({ authAlert: _react2.default.createElement(
+								'div',
+								{ className: 'alert alert-danger' },
+								_react2.default.createElement(
+									'strong',
+									null,
+									'Error! '
+								),
+								data.message
+							) });
+						console.log(data.message);
+						return null;
+					}
+	
+					_this2.setState({ logName: username });
+	
+					_this2.props.setToken(data.token);
+					_this2.props.setLogged(true);
+				});
+			}
+		}, {
+			key: 'render',
+			value: function render() {
+				var _this3 = this;
+	
+				var authform = _react2.default.createElement(
+					'form',
+					{ className: 'col-md-4 mx-auto' },
+					this.state.authAlert && !this.props.logged ? this.state.authAlert : null,
+					_react2.default.createElement(
+						'div',
+						{ className: 'form-group' },
+						_react2.default.createElement('input', { type: 'text', className: 'form-control', required: true,
+							ref: function ref(input) {
+								return _this3.authName = input;
+							}
+						}),
+						_react2.default.createElement('input', { type: 'password', className: 'form-control', required: true,
+							ref: function ref(input) {
+								return _this3.authPass = input;
+							}
+						})
+					),
+					_react2.default.createElement(
+						'button',
+						{ className: 'btn btn-primary',
+							onClick: function onClick(e) {
+								return _this3.authorize(e, _UrlConst.UrlConst.log, _this3.authName.value, _this3.authPass.value);
+							}
+						},
+						'Login'
+					),
+					_react2.default.createElement(
+						'button',
+						{ className: 'btn btn-secondary',
+							onClick: function onClick(e) {
+								return _this3.authorize(e, _UrlConst.UrlConst.reg, _this3.authName.value, _this3.authPass.value);
+							}
+						},
+						'Reg'
+					)
+				);
+				var logged = _react2.default.createElement(
+					'div',
+					null,
+					'Logged as ',
+					_react2.default.createElement(
+						'strong',
+						null,
+						this.state.logName
+					)
+				);
+	
+				var pattern = _react2.default.createElement(
+					'div',
+					{ className: 'my-4' },
+					this.props.logged ? logged : authform
+				);
+	
+				return this.props.hide ? null : pattern;
+			}
+		}]);
+	
+		return AuthForm;
+	}(_react2.default.Component);
+	
+	exports.default = AuthForm;
+	;
+
+/***/ },
+/* 187 */
 /*!***************************************!*\
   !*** ./src/components/ProductList.js ***!
   \***************************************/
@@ -23625,7 +23727,7 @@
 	};
 
 /***/ },
-/* 187 */
+/* 188 */
 /*!***************************************!*\
   !*** ./src/components/ProductPage.js ***!
   \***************************************/
@@ -23679,78 +23781,6 @@
 	};
 
 /***/ },
-/* 188 */
-/*!**************************************!*\
-  !*** ./src/components/RegLogForm.js ***!
-  \**************************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	
-	Object.defineProperty(exports, "__esModule", {
-		value: true
-	});
-	exports.RegLogForm = undefined;
-	
-	var _react = __webpack_require__(/*! react */ 1);
-	
-	var _react2 = _interopRequireDefault(_react);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	var RegLogForm = exports.RegLogForm = function RegLogForm(props) {
-		var authform = _react2.default.createElement(
-			"form",
-			{ className: "col-md-4 mx-auto" },
-			props.authAlert && !props.logged ? props.authAlert : null,
-			_react2.default.createElement(
-				"div",
-				{ className: "form-group" },
-				_react2.default.createElement("input", { type: "text", className: "form-control", required: true,
-					onChange: function onChange(e) {
-						return props.setLogin(e);
-					} }),
-				_react2.default.createElement("input", { type: "password", className: "form-control", required: true,
-					onChange: function onChange(e) {
-						return props.setPass(e);
-					} })
-			),
-			_react2.default.createElement(
-				"button",
-				{ onClick: function onClick(e) {
-						return props.submitLogin(e);
-					}, className: "btn btn-primary" },
-				"Login"
-			),
-			_react2.default.createElement(
-				"button",
-				{ onClick: function onClick(e) {
-						return props.submitReg(e);
-					}, className: "btn btn-secondary" },
-				"Reg"
-			)
-		);
-		var logged = _react2.default.createElement(
-			"div",
-			null,
-			"Logged as ",
-			_react2.default.createElement(
-				"strong",
-				null,
-				props.logName
-			)
-		);
-	
-		var pattern = _react2.default.createElement(
-			"div",
-			{ className: "my-4" },
-			props.logged ? logged : authform
-		);
-	
-		return props.hide ? null : pattern;
-	};
-
-/***/ },
 /* 189 */
 /*!***************************************!*\
   !*** ./src/components/AuthControl.js ***!
@@ -23779,16 +23809,12 @@
 				{ className: "d-inline-block ml-auto" },
 				_react2.default.createElement(
 					"button",
-					{ onClick: function onClick() {
-							return props.showAuthForm();
-						}, className: "btn btn-primary" },
+					{ onClick: props.showAuthForm, className: "btn btn-primary" },
 					"Login"
 				),
 				_react2.default.createElement(
 					"button",
-					{ onClick: function onClick() {
-							return props.showAuthForm();
-						}, className: "btn btn-info" },
+					{ onClick: props.showAuthForm, className: "btn btn-info" },
 					"Sign up"
 				)
 			)

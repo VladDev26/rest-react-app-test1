@@ -6,7 +6,7 @@ import 'whatwg-fetch';
 import ProductReviews 					from './ProductReviews';
 import AuthForm 						from './AuthForm';
 
-import { UrlConst } 					from '../const/UrlConst';
+import UrlConst 						from '../const/UrlConst';
 import { AuthAlerts } 					from '../const/Alerts';
 
 import { ProductList } 					from '../components/ProductList';
@@ -50,6 +50,8 @@ export default class App extends React.Component{
 			.then(json => json)
 			.catch(ex => console.log('parsing failed', ex));
 	}
+
+
 	showProduct(id, product){
 		this.setState({
 			hideProductList: true,
@@ -61,6 +63,8 @@ export default class App extends React.Component{
 		this.getReviewsByID(UrlConst.reviews, id)
 			.then( reviews => { this.setState({ reviews }); });
 	}
+
+
 	showAuthForm(){
 		this.setState({
 			hideForm: false,
@@ -68,9 +72,8 @@ export default class App extends React.Component{
 		});
 	}
 
-	setLogged(flag){
-		flag ? this.setState({isLogged: true}) : this.setState({isLogged: false});
-	}
+	setLogged(flag){ this.setState({isLogged: flag}); }
+
 	setToken(token){ this.setState({ token }); }
 
 
@@ -81,12 +84,14 @@ export default class App extends React.Component{
 					hide={this.state.hideAuthControl} 
 					showAuthForm={this.showAuthForm.bind(this)} 
 				/>
+
 				<AuthForm 
 					setLogged={this.setLogged.bind(this)}
 					setToken={this.setToken.bind(this)}
 					hide={this.state.hideForm}
 					logged={this.state.isLogged}
 				/>
+
 				<ProductList 
 					showProduct={this.showProduct.bind(this)} 
 					hide={this.state.hideProductList} 

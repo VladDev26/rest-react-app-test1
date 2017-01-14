@@ -4,7 +4,7 @@ if (!window.Promise) {window.Promise = Promise;}
 import 'whatwg-fetch';
 
 
-import { UrlConst } from '../const/UrlConst';
+import UrlConst 		from '../const/UrlConst';
 import { ReviewAlerts } from '../const/Alerts';
 
 export default class ProductReviews extends React.Component{
@@ -44,7 +44,7 @@ export default class ProductReviews extends React.Component{
 	render(){
 		// console.log('ProductReview this ', this);
 
-		let review = this.props.reviews.map( item => {
+		let review = this.props.reviews.reverse().map( item => {
 			return(
 				<li className="list-group-item justify-content-between" key={item.id}>
 					<div className="d-flex w-100 justify-content-between">

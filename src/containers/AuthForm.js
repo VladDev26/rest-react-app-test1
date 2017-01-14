@@ -3,8 +3,8 @@ import Promise from 'promise-polyfill';
 if (!window.Promise) {window.Promise = Promise;}
 import 'whatwg-fetch';
 
-import { UrlConst } from '../const/UrlConst';
-import { AuthAlerts } from '../const/Alerts';
+import UrlConst 		from '../const/UrlConst';
+import { AuthAlerts } 	from '../const/Alerts';
 
 export default class AuthForm extends React.Component{
 	
