@@ -4,8 +4,10 @@ if (!window.Promise) {window.Promise = Promise;}
 import 'whatwg-fetch';
 
 
-import UrlConst 		from '../const/UrlConst';
-import { ReviewAlerts } from '../const/Alerts';
+import UrlConst 					from '../const/UrlConst';
+import { ReviewAlerts, AuthAlerts } from '../const/Alerts';
+
+import Review 						from '../components/Review';
 
 export default class ProductReviews extends React.Component{
 	
@@ -13,9 +15,18 @@ export default class ProductReviews extends React.Component{
 		this.state = { reviewAlert: null };
 	}
 
+	clearReviewForm(){
+		this.reviewText.value = '';
+		this.reviewRate.value = 1;
+	}
+
+	setAlert(reviewAlert){
+		return this.setState({ reviewAlert });
+	}
+
 	addReview(id, rate, text){
 		if(text == '') {
-			this.setState({ reviewAlert: ReviewAlerts.empty });
+			this.setAlert( ReviewAlerts.empty );
 			return null;
 		}
 
@@ -29,35 +40,18 @@ export default class ProductReviews extends React.Component{
 			})
 			.then( response => response.json())
 			.then( json => {
-				this.setState({ reviewAlert: ReviewAlerts.success });
-				this.reviewText.value = '';
-				this.reviewRate.value = 1;
+				this.setAlert( ReviewAlerts.success );
+				this.clearReviewForm();
 				return json;
 			})
 			.catch(ex => {
-				this.setState({ reviewAlert: ReviewAlerts.serverError });
+				this.setAlert( AuthAlerts.serverError(ex) );
 				console.log(ex);
 			});
 	}
 
 
 	render(){
-		// console.log('ProductReview this ', this);
-
-		let review = this.props.reviews.reverse().map( item => {
-			return(
-				<li className="list-group-item justify-content-between" key={item.id}>
-					<div className="d-flex w-100 justify-content-between">
-				    	<h5 className="mb-1">{item.created_by.username}</h5>
-				    	<small className="text-muted">{item.created_at}</small>
-				    </div>
-					{item.text}
-					<span className="badge badge-success badge-pill">{item.rate}</span>
-				</li>
-			);
-		});
-
-
 		let reviewForm = (
 			<div className="mb-4">
 				<textarea className="form-control" rows="3"
@@ -98,12 +92,9 @@ export default class ProductReviews extends React.Component{
 		let pattern = (
 			<div className="col">
 				{this.state.reviewAlert ? this.state.reviewAlert : null}
-
 				{setReview}
 				<h3 className="my-3">Reviews</h3>
-				<ul className="list-group" style={{color: '#2a2b32'}}>
-					{review}
-				</ul>
+				<Review reviews={this.props.reviews} />
 			</div>
 		);
 		

@@ -34,23 +34,16 @@ export default class App extends React.Component{
 	}
 
 	componentDidMount(){
-		this.getAllProducts(UrlConst.products)
+		this.getJSON(UrlConst.products)
 			.then(products => this.setState({ products }) );
 	}
 
-	getAllProducts(url){
+	getJSON(url){
 		return fetch(url)
 			.then(response => response.json())
 			.then(json => json)
 			.catch(ex => console.log('parsing failed', ex));
 	}
-	getReviewsByID(url, id){
-		return fetch(url+id)
-			.then(response => response.json())
-			.then(json => json)
-			.catch(ex => console.log('parsing failed', ex));
-	}
-
 
 	showProduct(id, product){
 		this.setState({
@@ -60,7 +53,7 @@ export default class App extends React.Component{
 			product: product
 		});
 
-		this.getReviewsByID(UrlConst.reviews, id)
+		this.getJSON(UrlConst.reviews + id)
 			.then( reviews => { this.setState({ reviews }); });
 	}
 

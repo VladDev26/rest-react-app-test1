@@ -10,13 +10,9 @@ export const ReviewAlerts = {
 		<div className="alert alert-danger">
 		  Please fill the text field.
 		</div>
-	),
-	serverError: (
-		<div className="alert alert-danger">
-		  <strong>Something went wrong :(</strong>
-		</div>
 	)
 };
+
 
 
 export const AuthAlerts = {
@@ -37,5 +33,13 @@ export const AuthAlerts = {
 			<strong>Error! </strong>
 			Length must be at least 3 characters.
 		</div>
-	)
+	),
+	serverError: msg => {
+		return(
+			<div className="alert alert-danger">
+				<strong>Error! </strong>
+				{msg}
+			</div>
+		);
+	}
 };

@@ -50,12 +50,9 @@ export default class AuthForm extends React.Component{
 		this.requestLogReg(url, username, password)
 			.then(data => {
 				if(!data.success){
-					this.setState({authAlert: (
-						<div className="alert alert-danger">
-							<strong>Error! </strong>
-							{data.message}
-						</div>
-					)});
+					this.setState({
+						authAlert: AuthAlerts.serverError(data.message)
+					});
 					console.log(data.message);
 					return null;
 				}
